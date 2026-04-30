@@ -194,6 +194,8 @@ Pour garantir la compatibilité, l'utilisation des composants testés pendant le
 
 - [RetroPixelLED original](https://github.com/fjgordillo86/RetroPixelLED)
 - [Recalbox community](https://www.recalbox.com/fr/)
+- [Systems logos  are released under Creative Commons Attribution-NonCommercial-NoDerivs 4.0 License CC BY-NC-ND](https://creativecommons.org/licenses/by-nc-nd/4.0/)
+- [Bounitos](https://github.com/BenoitBounar)
 
 ## ☕ Soutenir le projet
 
