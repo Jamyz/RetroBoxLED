@@ -2,10 +2,12 @@
 
 Firmware **ESP32** pour **Recalbox** LED marquee (HUB75/DMD 128x32 P4 panels).
 
+✅Compatible Recalbox 10.0.5
+
 ## ✨ Fonctionnalités
 
 - **GIF playback** : Lecture de GIFS et de PNG (/Arcade, /BEST_OF_TOP_30, /Pixel_Art, etc...)
-- **Fallbacks** : /systems/default/default.gif 
+- **Fallbacks** : /systems/_defaults/_default.png 
 - **Playlists** : Arcade.txt, Favories.txt, Consoles.txt
 - **MQTT** : EmulationStation events (rungame, shutdown...)
 - **Recalbox** : Auto Arcade mode
@@ -16,20 +18,21 @@ Firmware **ESP32** pour **Recalbox** LED marquee (HUB75/DMD 128x32 P4 panels).
 Par défaut le ESP32 jouera une playlist de gifs.
 Une fois qu'il reçoit les infos de MQQT. Il se mettra automatiquement en mode ARCADE.
 Une fois que la Recalbox est éteinte. Le ESP32 jouera à nouveau la playlist.
-Si il manque un gif ou png. Il jouera le gif ou png dans le dossier que vous aurez mis dans /systems/default.
+Si il manque un gif ou png. Il jouera le gif ou png dans le dossier que vous aurez mis dans /systems/_defaults.
 
 ## 📁 Structure SD
 
 La carte SD devra être formaté en FAT32.
 En  ayant la structure suivante.
+Copier le dossier _defaults dans le repertoire systems de votre carte SD.
 
 ```
 RetroBoxLED SD Card/
 ├── gifs/
-│   ├── Arcade/, BEST_OF_TOP_30/, Pixel_Art/      ^\^| GIFs
+│   ├── Arcade/, BEST_OF_TOP_30/, Pixel_Art/| GIFs
 ├── systems/
-│   ├── mame/, neogeo/, snes/      ^\^| GIFs
-│   ├── default/, favorites/       ^\^| fallback
+│   ├── mame/, neogeo/, snes/               | GIFs
+│   ├── _defaults/                          | fallback
 ├── playlists
 │   ├── Arcade.txt, Favories.txt, Consoles.txt
 
@@ -77,7 +80,7 @@ wifi_dns2=8.8.8.8  #À renseigner seulement si wifi_static_enabled=1
 
 #MQQT
 recalbox_ip=192.168.20.104 #Adresse IP fixe de votre Recalbox
-mqtt_timeout=30 #Temps d'attente avant de lancer la playlist si MQQT ne reponds pas
+mqtt_timeout=30 #Temps d'attente avant de lancer la playlist si MQQT ne reponds pas. L'ideal est de mettre comme l'economiseur d'écran.
 ```
 
 ## 2 - ▶️ Playlists
@@ -102,24 +105,7 @@ La meilleure option pour le panneau est de faire un scrapping avec le type d'ima
 Une fois les images convertis. Copier tout les dossiers et coller tout dans /systems de votre carte SD.
 
 Vous trouverez un dossier avec tout les systemes et leur images déjà convertie.
-Vous aurez aussi un systeme nommé **default**. Si vous placez un fichier _default.gif ou _default.png sera celui par defaut si aucune image systeme est trouvée.
-Chaque systeme aura son propre fichier _default. Certains systemes (per exemple snes) peuvent contenir une image **Super Nintendo** ou **Super Famicom**.
-
-
-Exemple:
-
-```
-RetroBoxLED SD Card/
-├── systems/
-│   ├── neogeo/
-│   │   ├── _default.gif
-│   │   ├── _default.png
-│   │   ├── mslug.gif
-│   │   ├── mslug.png
-│   ├── snes/
-│   │   ├── _default.gif
-│   │   ├── SuperMarioWorld(Europe).png
-```
+Vous aurez aussi un systeme nommé **_defaults**. Si vous placez un fichier _default.gif ou _default.png sera celui par defaut si aucune image systeme est trouvée.
 Par défaut les gifs sont prioritaires sur les png.
 
 ## 4 -⚡Flash
@@ -158,7 +144,7 @@ Voici un exemple
 1. Tu lances King of Fighters (mame/kof98)
 2. marquee[rungame,endgame,shutdown,reboot,systembrowsing,start](permanent).sh détecte → MQTT "mame/kof98"  
 3. ESP32 reçoit → /systems/mame/kof98.gif
-4. Pas de GIF ? → /systems/default/default.gif
+4. Pas de GIF ? → /systems/_defaults/_default.gif
 ```
 Le fichier [`marquee[rungame,endgame,shutdown,reboot,systembrowsing,start.sh]`](https://example.com)
 doit etre dans /recalbox/share/userscripts/ de votre Recalbox
