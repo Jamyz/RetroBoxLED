@@ -55,11 +55,11 @@ Dans celui-ci vous pourrez configurer
 
 ```
 #Info
-info=0 #Affiche les infos au demarrage
+info=0 #0=aucune info au boot, 1=affiche les infos au boot
 
 #Playlist
 playlist=TODO.txt #Joue la playlist indiqué dans /playlist
-random=1 #0 pour jouer la playlist par ordre, 1 pour jouer la playlist aleatoirement
+random=1 #0=pour jouer la playlist par ordre, 1=pour jouer la playlist aleatoirement
 
 #Wifi & Bluetooth
 wifi_enabled=1 #0=Desactive le wifi, 1=Active le wifi. Laissez sur 1
