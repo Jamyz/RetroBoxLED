@@ -2,10 +2,12 @@
 
 Firmware **ESP32** pour **Recalbox** LED marquee (HUB75/DMD 128x32 P4 panels).
 
+✅Compatible Recalbox 10.0.5
+
 ## ✨ Fonctionnalités
 
 - **GIF playback** : Lecture de GIFS et de PNG (/Arcade, /BEST_OF_TOP_30, /Pixel_Art, etc...)
-- **Fallbacks** : /systems/default/default.gif 
+- **Fallbacks** : /systems/_defaults/_default.png 
 - **Playlists** : Arcade.txt, Favories.txt, Consoles.txt
 - **MQTT** : EmulationStation events (rungame, shutdown...)
 - **Recalbox** : Auto Arcade mode
@@ -16,20 +18,21 @@ Firmware **ESP32** pour **Recalbox** LED marquee (HUB75/DMD 128x32 P4 panels).
 Par défaut le ESP32 jouera une playlist de gifs.
 Une fois qu'il reçoit les infos de MQQT. Il se mettra automatiquement en mode ARCADE.
 Une fois que la Recalbox est éteinte. Le ESP32 jouera à nouveau la playlist.
-Si il manque un gif ou png. Il jouera le gif ou png dans le dossier que vous aurez mis dans /systems/default.
+Si il manque un gif ou png. Il jouera le gif ou png dans le dossier que vous aurez mis dans /systems/_defaults.
 
 ## 📁 Structure SD
 
 La carte SD devra être formaté en FAT32.
 En  ayant la structure suivante.
+Copier le dossier _defaults dans le repertoire systems de votre carte SD.
 
 ```
 RetroBoxLED SD Card/
 ├── gifs/
-│   ├── Arcade/, BEST_OF_TOP_30/, Pixel_Art/      ^\^| GIFs
+│   ├── Arcade/, BEST_OF_TOP_30/, Pixel_Art/| GIFs
 ├── systems/
-│   ├── mame/, neogeo/, snes/      ^\^| GIFs
-│   ├── default/, favorites/       ^\^| fallback
+│   ├── mame/, neogeo/, snes/               | GIFs
+│   ├── _defaults/                          | fallback
 ├── playlists
 │   ├── Arcade.txt, Favories.txt, Consoles.txt
 
@@ -41,7 +44,7 @@ Avant utilisation.
 
 1. **Configuration** : Configuration du fichier config.ini
 2. **Playlists** : Création de playlists
-3. **RecalboxMirrorSD** : Création des répertoires pour le mode Recalbox
+3. **Outils** : Utilisation des scripts
 4. **Flash** : ESP32 firmware
 5. **MQTT** : Explication et fonctionnement
 6. **Telnet** : Terminal Telnet pour test
@@ -54,27 +57,30 @@ Vous devez avoir le fichier config.ini à la racine de la carte SD.
 Dans celui-ci vous pourrez configurer
 
 ```
+#Info
+info=0 #0=aucune info au boot, 1=affiche les infos au boot
+
 #Playlist
-playlist=TODO.txt (joue la playlist indiqué dans /playlist)
-random=true #a verifier
+playlist=TODO.txt #Joue la playlist indiqué dans /playlist
+random=1 #0=pour jouer la playlist par ordre, 1=pour jouer la playlist aleatoirement
 
 #Wifi & Bluetooth
-wifi_enabled=1 (0=Desactive le wifi, 1=Active le wifi. Laissez sur 1)
-wifi_ssid=monwifi (nom de votre reseau wifi)
-wifi_password=monpasse (mot de passe de votre reseau wifi)
-bluetooth_enabled=0 (0=Desactive le bluetooth, 1=Active le bluetooth. Laissez sur 0. Cela depends si vous avez des interferences, par exemple manette 8Bitdo Pro 3)
-bluetooth_name=ESP32-GIF (Nom Bluetooth)
+wifi_enabled=1 #0=Desactive le wifi, 1=Active le wifi. Laissez sur 1
+wifi_ssid=monwifi #Nom de votre reseau wifi
+wifi_password=monpasse #Mot de passe de votre reseau wifi
+bluetooth_enabled=0 #0=Desactive le bluetooth, 1=Active le bluetooth. Laissez sur 0. Cela depends si vous avez des interferences, par exemple manette 8Bitdo Pro 3
+bluetooth_name=ESP32-GIF #Nom Bluetooth
 
-wifi_static_enabled=1 (0=DHCP, 1=IP fixe. Preferez une IP fixe.)
-wifi_static_ip=192.168.20.240 (À renseigner seulement si wifi_static_enabled=1)
-wifi_gateway=192.168.20.1  (À renseigner seulement si wifi_static_enabled=1)
-wifi_subnet=255.255.255.0  (À renseigner seulement si wifi_static_enabled=1)
-wifi_dns1=1.1.1.1  (À renseigner seulement si wifi_static_enabled=1)
-wifi_dns2=8.8.8.8  (À renseigner seulement si wifi_static_enabled=1)
+wifi_static_enabled=1 #0=DHCP, 1=IP fixe. Preferez une IP fixe.
+wifi_static_ip=192.168.20.240 #À renseigner seulement si wifi_static_enabled=1
+wifi_gateway=192.168.20.1  #À renseigner seulement si wifi_static_enabled=1
+wifi_subnet=255.255.255.0  #À renseigner seulement si wifi_static_enabled=1
+wifi_dns1=1.1.1.1  #À renseigner seulement si wifi_static_enabled=1
+wifi_dns2=8.8.8.8  #À renseigner seulement si wifi_static_enabled=1
 
 #MQQT
-recalbox_ip=192.168.20.104 (Adresse IP fixe de votre Recalbox)
-
+recalbox_ip=192.168.20.104 #Adresse IP fixe de votre Recalbox
+mqtt_timeout=30 #Temps d'attente avant de lancer la playlist si MQQT ne reponds pas. L'ideal est de mettre comme l'economiseur d'écran.
 ```
 
 ## 2 - ▶️ Playlists
@@ -87,29 +93,19 @@ Vous pourrez choisir les dossiers à mettre dans votre playlist (par exemple les
 Si vous voulez tout mettre dans une playlist. Mettez "TODO".
 
 
-## 3 - 💾 RecalboxMirrorSD
+## 🛠️ - 💾 Outils
 
-Il permet de créer le dossier **systems** dans la carte SD.
-Il créera des dossiers vides des systèmes que vous avez dans le dossier roms de votre Recalbox.
-Vous devrez juste indiquer sur quel lettre se trouve votre carte SD (D:,E:, etc...). Juste la lettre suffit.
-Et mettre votre emplacement réseau du type \\192.168.1.10\Recalbox\roms
-Il créera 2 dossiers en plus, qui sont **default** et **favorites**.
-Pour chaque système et jeux. Vous devrez mettre un *.gif ou *.png avec le même nom.
+Deux Scripts sont à votre disposition.
 
-Exemple:
+**extract_gamelist_images** : Extrait les images de vos dossiers medias et les renomme selon le path du gamelist.xml
+**convert_128x32** : Converti les images en 128x32
 
-```
-RetroBoxLED SD Card/
-├── systems/
-│   ├── neogeo/
-│   │   ├── neogeo.gif
-│   │   ├── neogeo.png
-│   │   ├── mslug.gif
-│   │   ├── mslug.png
-│   ├── snes/
-│   │   ├── snes.gif
-│   │   ├── Super Mario World (Europe).png
-```
+L'ideal est de placer ces deux fichiers dans un repertoire pour avoir tout sous la main. Il copiera les images dans le dossier où se trouvent les scripts.
+La meilleure option pour le panneau est de faire un scrapping avec le type d'image **LOGO DETOURE** ou **MARQUEE** qui sont ideals pour le panneau LED.
+Une fois les images convertis. Copier tout les dossiers et coller tout dans /systems de votre carte SD.
+
+Vous trouverez un dossier avec tout les systemes et leur images déjà convertie.
+Vous aurez aussi un systeme nommé **_defaults**. Si vous placez un fichier _default.gif ou _default.png sera celui par defaut si aucune image systeme est trouvée.
 Par défaut les gifs sont prioritaires sur les png.
 
 ## 4 -⚡Flash
@@ -146,11 +142,11 @@ Ce que fait MQTT c'est dire au ESP32 ce qu'il doit lancer.
 Voici un exemple
 ```
 1. Tu lances King of Fighters (mame/kof98)
-2. marquee[rungame,endgame,shutdown,reboot,systembrowsing,start](permanent).sh détecte → MQTT "mame/kof98"  
+2. marquee[rungame,endgame,systembrowsing,gamelistbrowsing,sleep,wakeup,stop,start](permanent).sh détecte → MQTT "mame/kof98"  
 3. ESP32 reçoit → /systems/mame/kof98.gif
-4. Pas de GIF ? → /systems/default/default.gif
+4. Pas de GIF ? → /systems/_defaults/_default.gif
 ```
-Le fichier [`marquee[rungame,endgame,shutdown,reboot,systembrowsing,start.sh]`](https://example.com)
+Le fichier marquee[rungame,endgame,systembrowsing,gamelistbrowsing,sleep,wakeup,stop,start](permanent).sh
 doit etre dans /recalbox/share/userscripts/ de votre Recalbox
 
 ## 6 - >_ Telnet
@@ -184,6 +180,8 @@ Pour garantir la compatibilité, l'utilisation des composants testés pendant le
 
 - [RetroPixelLED original](https://github.com/fjgordillo86/RetroPixelLED)
 - [Recalbox community](https://www.recalbox.com/fr/)
+- [Systems logos  are released under Creative Commons Attribution-NonCommercial-NoDerivs 4.0 License CC BY-NC-ND](https://creativecommons.org/licenses/by-nc-nd/4.0/)
+- [Bounitos](https://github.com/BenoitBounar)
 
 ## ☕ Soutenir le projet
 
